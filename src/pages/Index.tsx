@@ -1,11 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import VideoUpload from "@/components/VideoUpload";
 import VideoSummary from "@/components/VideoSummary";
+import VideoHistory from "@/components/VideoHistory";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, Upload, Clock, Zap, Target, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface VideoData {
   id: string;
@@ -13,17 +17,50 @@ interface VideoData {
   duration: string;
   url: string;
   thumbnail: string;
+  summary?: any;
+  sections?: any;
 }
 
 const Index = () => {
   const [currentVideoData, setCurrentVideoData] = useState<VideoData | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
 
-  const handleVideoProcessed = (videoData: VideoData) => {
+  const handleVideoProcessed = async (videoData: VideoData) => {
     setCurrentVideoData(videoData);
+    
+    // Save video to database if user is authenticated
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('videos')
+          .insert({
+            user_id: user.id,
+            title: videoData.title,
+            url: videoData.url,
+            duration: videoData.duration,
+            thumbnail: videoData.thumbnail,
+            summary: videoData.summary || null,
+            sections: videoData.sections || null
+          });
+
+        if (error) {
+          console.error('Error saving video:', error);
+          toast({
+            title: "Note",
+            description: "Video processed but not saved. Please sign in to save your summaries.",
+          });
+        }
+      } catch (error) {
+        console.error('Error saving video:', error);
+      }
+    }
   };
 
   const handleBackToUpload = () => {
     setCurrentVideoData(null);
+    setShowHistory(false);
   };
 
   const features = [
@@ -49,13 +86,21 @@ const Index = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-green-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
       <div className="gradient-mesh min-h-screen">
         <Header />
         
         <main className="container mx-auto px-4 py-12">
-          {!currentVideoData ? (
+          {!currentVideoData && !showHistory ? (
             <>
               {/* Hero Section */}
               <div className="text-center space-y-8 mb-16">
@@ -76,26 +121,32 @@ const Index = () => {
                   <Button 
                     size="lg" 
                     className="bg-brand-gradient hover:opacity-90 text-white px-8 py-3 text-lg"
+                    onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
                   >
                     <Upload className="h-5 w-5 mr-2" />
                     Upload Video
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    className="px-8 py-3 text-lg border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
-                  >
-                    <Search className="h-5 w-5 mr-2" />
-                    Try with URL
-                  </Button>
+                  {user && (
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      className="px-8 py-3 text-lg border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
+                      onClick={() => setShowHistory(true)}
+                    >
+                      <Search className="h-5 w-5 mr-2" />
+                      View History
+                    </Button>
+                  )}
                 </div>
               </div>
 
               {/* Upload Component */}
-              <VideoUpload onVideoProcessed={handleVideoProcessed} />
+              <div id="upload-section">
+                <VideoUpload onVideoProcessed={handleVideoProcessed} />
+              </div>
 
               {/* Features Section */}
-              <section className="mt-20 space-y-12">
+              <section id="features" className="mt-20 space-y-12">
                 <div className="text-center">
                   <h2 className="text-3xl font-bold mb-4">
                     Why Choose VideoSummarizer?
@@ -142,6 +193,8 @@ const Index = () => {
                 </Card>
               </section>
             </>
+          ) : showHistory ? (
+            <VideoHistory onBack={handleBackToUpload} onVideoSelect={setCurrentVideoData} />
           ) : (
             <VideoSummary 
               videoData={currentVideoData} 
