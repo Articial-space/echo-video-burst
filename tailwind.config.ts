@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,23 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				brand: {
+					black: '#000000',
+					green: {
+						400: '#4ade80',
+						500: '#22c55e',
+						600: '#16a34a',
+						700: '#15803d'
+					},
+					white: '#ffffff'
 				}
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+				'brand-gradient': 'linear-gradient(135deg, #000000 0%, #16a34a 50%, #000000 100%)',
+				'brand-gradient-light': 'linear-gradient(135deg, #f8fafc 0%, #dcfce7 50%, #f8fafc 100%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +101,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'pulse-green': {
+					'0%, 100%': { boxShadow: '0 0 0 0 rgba(34, 197, 94, 0.7)' },
+					'50%': { boxShadow: '0 0 0 10px rgba(34, 197, 94, 0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'pulse-green': 'pulse-green 2s infinite'
 			}
 		}
 	},
