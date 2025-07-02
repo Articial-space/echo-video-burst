@@ -109,13 +109,15 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
           <Button
             variant="ghost"
             onClick={onBack}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 hover:bg-brand-green-50 hover:text-brand-green-700"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Video History</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
+              Video History
+            </h1>
             <p className="text-muted-foreground">
               {videos.length} video{videos.length !== 1 ? 's' : ''} saved
             </p>
@@ -124,27 +126,27 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
       </div>
 
       {/* Search */}
-      <Card className="p-4 glass-effect">
+      <Card className="p-4 glass-effect border-brand-green-200">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-brand-green-600" />
           <Input
             placeholder="Search your videos..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 border-brand-green-200 focus:border-brand-green-500 focus:ring-brand-green-500"
           />
         </div>
       </Card>
 
       {/* Videos Grid */}
       {filteredVideos.length === 0 ? (
-        <Card className="p-12 glass-effect text-center">
+        <Card className="p-12 glass-effect text-center border-brand-green-200">
           <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto bg-brand-gradient rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto bg-brand-gradient rounded-full flex items-center justify-center shadow-lg">
               <Play className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">
                 {searchQuery ? 'No videos found' : 'No videos yet'}
               </h3>
               <p className="text-muted-foreground">
@@ -157,7 +159,7 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
             {!searchQuery && (
               <Button
                 onClick={onBack}
-                className="bg-brand-gradient hover:opacity-90"
+                className="bg-brand-gradient hover:opacity-90 text-white shadow-lg"
               >
                 Upload Video
               </Button>
@@ -167,16 +169,16 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredVideos.map((video) => (
-            <Card key={video.id} className="p-4 glass-effect group hover:shadow-lg transition-all duration-300">
+            <Card key={video.id} className="p-4 glass-effect group hover:shadow-lg transition-all duration-300 border-brand-green-200">
               <div className="space-y-4">
                 {/* Thumbnail */}
-                <div className="aspect-video bg-gradient-to-br from-brand-green-100 to-brand-green-200 rounded-lg flex items-center justify-center">
-                  <Play className="h-8 w-8 text-brand-green-600" />
+                <div className="aspect-video bg-brand-gradient rounded-lg flex items-center justify-center shadow-md">
+                  <Play className="h-8 w-8 text-white" />
                 </div>
 
                 {/* Video Info */}
                 <div className="space-y-2">
-                  <h3 className="font-semibold line-clamp-2 group-hover:text-brand-green-600 transition-colors">
+                  <h3 className="font-semibold line-clamp-2 group-hover:text-brand-green-600 transition-colors text-gray-900">
                     {video.title}
                   </h3>
                   
@@ -195,7 +197,7 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
                 <div className="flex space-x-2">
                   <Button
                     onClick={() => onVideoSelect(video)}
-                    className="flex-1 bg-brand-gradient hover:opacity-90"
+                    className="flex-1 bg-brand-gradient hover:opacity-90 text-white shadow-md"
                     size="sm"
                   >
                     <Play className="h-3 w-3 mr-1" />
@@ -205,7 +207,7 @@ const VideoHistory = ({ onBack, onVideoSelect }: VideoHistoryProps) => {
                     variant="outline"
                     size="sm"
                     onClick={() => deleteVideo(video.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
