@@ -6,7 +6,7 @@ import VideoSummary from "@/components/VideoSummary";
 import VideoHistory from "@/components/VideoHistory";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Upload, Clock, Zap, Target, Users } from "lucide-react";
+import { Search, Upload, Clock, Zap, Target, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -99,41 +99,41 @@ const Index = () => {
       <div className="gradient-mesh min-h-screen">
         <Header />
         
-        <main className="container mx-auto px-4 py-12">
+        <main className="container mx-auto px-4 py-8">
           {!currentVideoData && !showHistory ? (
             <>
               {/* Hero Section */}
-              <div className="text-center space-y-8 mb-16">
+              <div className="text-center space-y-6 mb-12">
                 <div className="space-y-4">
-                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                     Transform Videos into
                     <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
                       Actionable Insights
                     </span>
                   </h1>
-                  <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                     Upload any video or paste a URL to get instant AI-powered summaries, 
                     organized by sections with precise timestamps for easy navigation.
                   </p>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Button 
                     size="lg" 
-                    className="bg-brand-gradient hover:opacity-90 text-white px-8 py-3 text-lg"
+                    className="bg-brand-gradient hover:opacity-90 text-white px-6 py-3"
                     onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    <Upload className="h-5 w-5 mr-2" />
+                    <Upload className="h-4 w-4 mr-2" />
                     Upload Video
                   </Button>
                   {user && (
                     <Button 
                       variant="outline" 
                       size="lg"
-                      className="px-8 py-3 text-lg border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
+                      className="px-6 py-3 border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
                       onClick={() => setShowHistory(true)}
                     >
-                      <Search className="h-5 w-5 mr-2" />
+                      <Search className="h-4 w-4 mr-2" />
                       View History
                     </Button>
                   )}
@@ -141,14 +141,14 @@ const Index = () => {
               </div>
 
               {/* Upload Component */}
-              <div id="upload-section">
+              <div id="upload-section" className="mb-16">
                 <VideoUpload onVideoProcessed={handleVideoProcessed} />
               </div>
 
               {/* Features Section */}
-              <section id="features" className="mt-20 space-y-12">
+              <section id="features" className="space-y-8">
                 <div className="text-center">
-                  <h2 className="text-3xl font-bold mb-4">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3">
                     Why Choose VideoSummarizer?
                   </h2>
                   <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -158,14 +158,14 @@ const Index = () => {
                 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {features.map((feature, index) => (
-                    <Card key={index} className="p-6 glass-effect group hover:shadow-lg transition-all duration-300">
+                    <Card key={index} className="p-6 glass-effect group hover:shadow-lg transition-all duration-300 border-0">
                       <div className="space-y-4">
                         <div className="w-12 h-12 rounded-lg bg-brand-gradient flex items-center justify-center group-hover:animate-pulse-green">
                           <feature.icon className="h-6 w-6 text-white" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                          <p className="text-muted-foreground">{feature.description}</p>
+                          <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
                         </div>
                       </div>
                     </Card>
@@ -173,22 +173,22 @@ const Index = () => {
                 </div>
               </section>
 
-              {/* Stats Section */}
-              <section className="mt-20 py-12">
-                <Card className="p-8 glass-effect text-center">
-                  <div className="grid md:grid-cols-3 gap-8">
-                    <div className="space-y-2">
-                      <div className="text-3xl font-bold text-brand-green-600">10K+</div>
-                      <div className="text-muted-foreground">Videos Processed</div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-3xl font-bold text-brand-green-600">95%</div>
-                      <div className="text-muted-foreground">Time Saved</div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="text-3xl font-bold text-brand-green-600">4.9★</div>
-                      <div className="text-muted-foreground">User Rating</div>
-                    </div>
+              {/* CTA Section */}
+              <section className="mt-16 text-center">
+                <Card className="p-8 glass-effect border-0">
+                  <div className="space-y-4">
+                    <h3 className="text-2xl font-bold">Ready to get started?</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      Join thousands of professionals who save hours every week with VideoSummarizer.
+                    </p>
+                    <Button 
+                      size="lg"
+                      className="bg-brand-gradient hover:opacity-90"
+                      onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      Start Analyzing Videos
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
                   </div>
                 </Card>
               </section>
@@ -204,10 +204,10 @@ const Index = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border/40 bg-background/95 backdrop-blur mt-20">
+        <footer className="border-t border-border/40 bg-background/50 backdrop-blur mt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center space-x-2 mb-4 md:mb-0">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-2">
                 <div className="h-6 w-6 rounded bg-brand-gradient flex items-center justify-center">
                   <Search className="h-3 w-3 text-white" />
                 </div>
