@@ -6,7 +6,7 @@ import VideoSummary from "@/components/VideoSummary";
 import VideoHistory from "@/components/VideoHistory";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Upload, Clock, Zap, Target, ArrowRight } from "lucide-react";
+import { Search, Upload, Clock, Zap, Target, ArrowRight, History } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -71,18 +71,18 @@ const Index = () => {
     },
     {
       icon: Clock,
-      title: "Timestamp Navigation",
-      description: "Jump to any section instantly with precise timestamps for efficient video consumption."
+      title: "Instant Timestamps",
+      description: "Jump to any section with precise timestamps for efficient navigation."
     },
     {
       icon: Target,
       title: "Section Breakdown",
-      description: "Automatically divide long videos into digestible sections with clear summaries."
+      description: "Automatically divide videos into digestible sections with clear summaries."
     },
     {
       icon: Zap,
       title: "Lightning Fast",
-      description: "Get comprehensive summaries in seconds, not hours. Save time and stay informed."
+      description: "Get comprehensive summaries in seconds. Save time and stay informed."
     }
   ];
 
@@ -99,23 +99,20 @@ const Index = () => {
       <div className="gradient-mesh min-h-screen">
         <Header />
         
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-6">
           {!currentVideoData && !showHistory ? (
             <>
               {/* Hero Section */}
               <div className="text-center space-y-6 mb-12">
-                <div className="space-y-4">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-                    Transform Videos into
-                    <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
-                      Actionable Insights
-                    </span>
-                  </h1>
-                  <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                    Upload any video or paste a URL to get instant AI-powered summaries, 
-                    organized by sections with precise timestamps for easy navigation.
-                  </p>
-                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                  Transform Videos into
+                  <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
+                    Actionable Insights
+                  </span>
+                </h1>
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                  Upload any video or paste a URL to get instant AI-powered summaries with precise timestamps.
+                </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                   <Button 
@@ -133,14 +130,14 @@ const Index = () => {
                       className="px-6 py-3 border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
                       onClick={() => setShowHistory(true)}
                     >
-                      <Search className="h-4 w-4 mr-2" />
+                      <History className="h-4 w-4 mr-2" />
                       View History
                     </Button>
                   )}
                 </div>
               </div>
 
-              {/* Upload Component */}
+              {/* Upload Section */}
               <div id="upload-section" className="mb-16">
                 <VideoUpload onVideoProcessed={handleVideoProcessed} />
               </div>
@@ -152,7 +149,7 @@ const Index = () => {
                     Why Choose VideoSummarizer?
                   </h2>
                   <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Built for professionals who need to extract value from video content quickly and efficiently.
+                    Built for professionals who need to extract value from video content quickly.
                   </p>
                 </div>
                 
@@ -179,7 +176,7 @@ const Index = () => {
                   <div className="space-y-4">
                     <h3 className="text-2xl font-bold">Ready to get started?</h3>
                     <p className="text-muted-foreground max-w-md mx-auto">
-                      Join thousands of professionals who save hours every week with VideoSummarizer.
+                      Join thousands of professionals who save hours every week.
                     </p>
                     <Button 
                       size="lg"
@@ -205,7 +202,7 @@ const Index = () => {
 
         {/* Footer */}
         <footer className="border-t border-border/40 bg-background/50 backdrop-blur mt-16">
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-2">
                 <div className="h-6 w-6 rounded bg-brand-gradient flex items-center justify-center">

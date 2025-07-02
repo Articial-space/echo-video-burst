@@ -103,12 +103,12 @@ const SignIn = () => {
             </Link>
             
             <h1 className="text-2xl font-bold mb-2">
-              {isSignUp ? 'Create your account' : 'Welcome back'}
+              {isSignUp ? 'Create account' : 'Welcome back'}
             </h1>
             <p className="text-muted-foreground">
               {isSignUp 
-                ? 'Start analyzing videos with AI-powered summaries' 
-                : 'Sign in to access your video summaries'
+                ? 'Get started with AI-powered video summaries' 
+                : 'Sign in to access your summaries'
               }
             </p>
           </div>
@@ -142,7 +142,7 @@ const SignIn = () => {
                   <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground glass-effect">
+                  <span className="bg-background px-2 text-muted-foreground">
                     Or continue with email
                   </span>
                 </div>
