@@ -1,10 +1,12 @@
 
 import { useState, useRef } from "react";
-import { Upload, Search, Play, Clock } from "lucide-react";
+import { Upload, Search, Play, Clock, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { validateVideoUrl, validateVideoFile, sanitizeString } from "@/utils/securityUtils";
 
 interface VideoUploadProps {
   onVideoProcessed: (videoData: VideoData) => void;
@@ -22,14 +24,20 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [validationError, setValidationError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith('video/')) {
+    setValidationError("");
+    
+    // Enhanced file validation
+    const validation = validateVideoFile(file);
+    if (!validation.isValid) {
+      setValidationError(validation.error || "Invalid file");
       toast({
-        title: "Invalid file type",
-        description: "Please upload a video file",
+        title: "Invalid file",
+        description: validation.error,
         variant: "destructive",
       });
       return;
@@ -39,9 +47,10 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
     
     // Simulate video processing
     setTimeout(() => {
+      const sanitizedTitle = sanitizeString(file.name.replace(/\.[^/.]+$/, ""));
       const mockVideoData: VideoData = {
         id: Math.random().toString(36).substr(2, 9),
-        title: file.name.replace(/\.[^/.]+$/, ""),
+        title: sanitizedTitle || "Untitled Video",
         duration: "12:34",
         url: URL.createObjectURL(file),
         thumbnail: "/placeholder.svg"
@@ -77,15 +86,30 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
   const handleUrlSearch = () => {
     if (!searchQuery.trim()) return;
     
+    setValidationError("");
+    
+    // Enhanced URL validation
+    if (!validateVideoUrl(searchQuery.trim())) {
+      const errorMessage = "Please enter a valid video URL from supported platforms (YouTube, Vimeo, etc.) or a direct video file link.";
+      setValidationError(errorMessage);
+      toast({
+        title: "Invalid URL",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsProcessing(true);
     
     // Simulate URL processing
     setTimeout(() => {
+      const sanitizedTitle = sanitizeString("Video from URL");
       const mockVideoData: VideoData = {
         id: Math.random().toString(36).substr(2, 9),
-        title: "Video from URL",
+        title: sanitizedTitle,
         duration: "8:45",
-        url: searchQuery,
+        url: searchQuery.trim(),
         thumbnail: "/placeholder.svg"
       };
       
@@ -100,6 +124,16 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
     }, 2000);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // Clear validation error when user starts typing
+    if (validationError) {
+      setValidationError("");
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Search Bar */}
@@ -109,16 +143,24 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
             Enter video URL or upload a file
           </h2>
           
+          {validationError && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{validationError}</AlertDescription>
+            </Alert>
+          )}
+          
           <div className="flex space-x-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Paste YouTube, Vimeo, or any video URL here..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleInputChange}
                 onKeyPress={(e) => e.key === 'Enter' && handleUrlSearch()}
                 className="pl-10 h-12 text-base"
                 disabled={isProcessing}
+                maxLength={500}
               />
             </div>
             <Button 
@@ -169,7 +211,7 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
               <p className="text-muted-foreground">
                 {isProcessing 
                   ? 'This may take a few moments' 
-                  : 'Supports MP4, MOV, AVI, and more'
+                  : 'Supports MP4, MOV, AVI, and more (Max 100MB)'
                 }
               </p>
             </div>

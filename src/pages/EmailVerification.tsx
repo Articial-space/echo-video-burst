@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Mail, Clock, RefreshCw } from 'lucide-react';
+import { clearSecureStorage } from '@/utils/securityUtils';
 
 const EmailVerification = () => {
   const [countdown, setCountdown] = useState(60);
@@ -14,16 +15,22 @@ const EmailVerification = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Get email from URL params or localStorage
+  // Get email from URL params or sessionStorage (more secure than localStorage)
   const urlParams = new URLSearchParams(window.location.search);
-  const email = urlParams.get('email') || localStorage.getItem('pendingEmail') || '';
+  const email = urlParams.get('email') || sessionStorage.getItem('pendingEmail') || '';
 
   useEffect(() => {
-    // If user is already verified, redirect to home
+    // If user is already verified, redirect to home and clear storage
     if (user) {
+      clearSecureStorage(['pendingEmail']);
       navigate('/');
       return;
     }
+
+    // Auto-cleanup email from storage after 30 minutes
+    const cleanupTimer = setTimeout(() => {
+      clearSecureStorage(['pendingEmail']);
+    }, 30 * 60 * 1000); // 30 minutes
 
     // Countdown for resend button
     const timer = setInterval(() => {
@@ -36,7 +43,10 @@ const EmailVerification = () => {
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(cleanupTimer);
+    };
   }, [user, navigate]);
 
   const handleResendEmail = async () => {
@@ -50,7 +60,7 @@ const EmailVerification = () => {
     }
 
     try {
-      const { error } = await signUp(email, '', ''); // This will resend the verification email
+      const { error } = await signUp(email, '', '');
       if (error) {
         toast({
           title: "Failed to resend email",
@@ -80,6 +90,14 @@ const EmailVerification = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Clear email from URL for security
+  useEffect(() => {
+    if (urlParams.get('email')) {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
       <div className="gradient-mesh min-h-screen flex items-center justify-center p-4">
@@ -107,9 +125,11 @@ const EmailVerification = () => {
               <p className="text-muted-foreground">
                 We've sent a verification link to
               </p>
-              <p className="font-medium text-brand-green-700">
-                {email}
-              </p>
+              {email && (
+                <p className="font-medium text-brand-green-700 break-all">
+                  {email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -130,7 +150,7 @@ const EmailVerification = () => {
                 <Button
                   variant="outline"
                   onClick={handleResendEmail}
-                  disabled={!canResend}
+                  disabled={!canResend || !email}
                   className={`w-full ${
                     canResend 
                       ? 'border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50' 
@@ -162,6 +182,7 @@ const EmailVerification = () => {
               <Button
                 variant="link"
                 className="text-brand-green-600 hover:text-brand-green-700 h-auto p-0"
+                onClick={() => clearSecureStorage(['pendingEmail'])}
               >
                 Back to sign in
               </Button>

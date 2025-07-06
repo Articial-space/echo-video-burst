@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Eye, EyeOff } from 'lucide-react';
+import { sanitizeString, clearSecureStorage } from '@/utils/securityUtils';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -27,9 +28,39 @@ const SignIn = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Clear any existing secure storage
+    clearSecureStorage(['pendingEmail']);
+
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, fullName);
+        // Sanitize inputs
+        const sanitizedFullName = sanitizeString(fullName);
+        const sanitizedEmail = email.trim().toLowerCase();
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(sanitizedEmail)) {
+          toast({
+            title: "Invalid email",
+            description: "Please enter a valid email address.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Password strength validation
+        if (password.length < 8) {
+          toast({
+            title: "Weak password",
+            description: "Password must be at least 8 characters long.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        const { error } = await signUp(sanitizedEmail, password, sanitizedFullName);
         if (error) {
           toast({
             title: "Sign up failed",
@@ -37,17 +68,19 @@ const SignIn = () => {
             variant: "destructive",
           });
         } else {
-          // Store email for verification page
-          localStorage.setItem('pendingEmail', email);
+          // Store email securely in sessionStorage instead of localStorage
+          sessionStorage.setItem('pendingEmail', sanitizedEmail);
           toast({
             title: "Success!",
             description: "Please check your email to verify your account.",
           });
           // Redirect to email verification page
-          navigate(`/email-verification?email=${encodeURIComponent(email)}`);
+          navigate(`/email-verification`);
         }
       } else {
-        const { error } = await signIn(email, password);
+        const sanitizedEmail = email.trim().toLowerCase();
+        
+        const { error } = await signIn(sanitizedEmail, password);
         if (error) {
           toast({
             title: "Sign in failed",
@@ -71,6 +104,8 @@ const SignIn = () => {
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
+    clearSecureStorage(['pendingEmail']);
+    
     try {
       const { error } = await signInWithGoogle();
       if (error) {
@@ -90,6 +125,12 @@ const SignIn = () => {
       setGoogleLoading(false);
     }
   };
+
+  const handleInputChange = (setter: (value: string) => void, maxLength: number = 100) => 
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value.slice(0, maxLength);
+      setter(value);
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
@@ -162,8 +203,9 @@ const SignIn = () => {
                       type="text"
                       placeholder="Enter your full name"
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={handleInputChange(setFullName, 50)}
                       required={isSignUp}
+                      maxLength={50}
                     />
                   </div>
                 )}
@@ -175,8 +217,9 @@ const SignIn = () => {
                     type="email"
                     placeholder="Enter your email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleInputChange(setEmail, 100)}
                     required
+                    maxLength={100}
                   />
                 </div>
                 
@@ -190,7 +233,8 @@ const SignIn = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={isSignUp ? 8 : 6}
+                      maxLength={128}
                     />
                     <Button
                       type="button"
@@ -206,6 +250,11 @@ const SignIn = () => {
                       )}
                     </Button>
                   </div>
+                  {isSignUp && (
+                    <p className="text-xs text-muted-foreground">
+                      Password must be at least 8 characters long
+                    </p>
+                  )}
                 </div>
 
                 <Button 
@@ -233,7 +282,10 @@ const SignIn = () => {
             </p>
             <Button
               variant="link"
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                clearSecureStorage(['pendingEmail']);
+              }}
               className="text-brand-green-600 hover:text-brand-green-700 h-auto p-0 mt-1"
             >
               {isSignUp ? 'Sign in here' : 'Sign up here'}
