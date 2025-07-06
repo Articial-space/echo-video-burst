@@ -37,10 +37,14 @@ const SignIn = () => {
             variant: "destructive",
           });
         } else {
+          // Store email for verification page
+          localStorage.setItem('pendingEmail', email);
           toast({
             title: "Success!",
             description: "Please check your email to verify your account.",
           });
+          // Redirect to email verification page
+          navigate(`/email-verification?email=${encodeURIComponent(email)}`);
         }
       } else {
         const { error } = await signIn(email, password);

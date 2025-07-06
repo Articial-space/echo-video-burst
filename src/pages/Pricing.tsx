@@ -1,16 +1,21 @@
 
+import { useState } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Check, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Pricing = () => {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   const plans = [
     {
       name: "Free",
-      price: "$0",
-      period: "forever",
+      monthlyPrice: 0,
+      annualPrice: 0,
       description: "Perfect for trying out VideoSummarizer",
       features: [
         "3 video summaries per month",
@@ -24,8 +29,8 @@ const Pricing = () => {
     },
     {
       name: "Pro",
-      price: "$19",
-      period: "per month",
+      monthlyPrice: 19,
+      annualPrice: 16.15, // 15% off monthly price
       description: "Best for regular users and content creators",
       features: [
         "50 video summaries per month",
@@ -43,8 +48,8 @@ const Pricing = () => {
     },
     {
       name: "Enterprise",
-      price: "$99",
-      period: "per month",
+      monthlyPrice: 99,
+      annualPrice: 84.15, // 15% off monthly price
       description: "For teams and organizations",
       features: [
         "Unlimited video summaries",
@@ -63,6 +68,14 @@ const Pricing = () => {
     }
   ];
 
+  const getPrice = (plan: typeof plans[0]) => {
+    return isAnnual ? plan.annualPrice : plan.monthlyPrice;
+  };
+
+  const formatPrice = (price: number) => {
+    return price === 0 ? "$0" : `$${price.toFixed(2)}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
       <div className="gradient-mesh min-h-screen">
@@ -70,7 +83,7 @@ const Pricing = () => {
         
         <main className="container mx-auto px-4 py-8">
           {/* Header Section */}
-          <div className="text-center space-y-4 mb-12">
+          <div className="text-center space-y-6 mb-12">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Choose Your
               <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
@@ -80,6 +93,30 @@ const Pricing = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Start free and scale as you grow. All plans include core AI-powered video analysis.
             </p>
+            
+            {/* Billing Toggle */}
+            <div className="flex items-center justify-center space-x-4 p-4">
+              <span className={`text-sm font-medium transition-colors ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+                Monthly
+              </span>
+              <div className="relative">
+                <Switch
+                  checked={isAnnual}
+                  onCheckedChange={setIsAnnual}
+                  className="data-[state=checked]:bg-brand-green-600"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={`text-sm font-medium transition-colors ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+                  Annual
+                </span>
+                {isAnnual && (
+                  <Badge variant="secondary" className="bg-brand-green-100 text-brand-green-700 text-xs">
+                    Save 15%
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Pricing Cards */}
@@ -110,9 +147,19 @@ const Pricing = () => {
                   
                   <div className="space-y-1">
                     <div className="flex items-baseline space-x-1">
-                      <span className="text-3xl font-bold">{plan.price}</span>
-                      <span className="text-muted-foreground text-sm">/{plan.period}</span>
+                      <span className="text-3xl font-bold">{formatPrice(getPrice(plan))}</span>
+                      <span className="text-muted-foreground text-sm">
+                        {plan.monthlyPrice === 0 ? '/forever' : `/${isAnnual ? 'month' : 'month'}`}
+                      </span>
                     </div>
+                    {isAnnual && plan.monthlyPrice > 0 && (
+                      <div className="text-sm text-muted-foreground">
+                        <span className="line-through">${plan.monthlyPrice}/month</span>
+                        <span className="ml-2 text-brand-green-600 font-medium">
+                          (billed annually)
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -154,6 +201,13 @@ const Pricing = () => {
               </div>
               
               <div className="space-y-2">
+                <h3 className="font-semibold">What's included in annual billing?</h3>
+                <p className="text-muted-foreground text-sm">
+                  Annual plans save you 15% and are billed once per year. You can cancel anytime with a prorated refund.
+                </p>
+              </div>
+              
+              <div className="space-y-2">
                 <h3 className="font-semibold">What video formats are supported?</h3>
                 <p className="text-muted-foreground text-sm">
                   All major formats including MP4, MOV, AVI, plus direct URLs from YouTube, Vimeo, and more.
@@ -164,13 +218,6 @@ const Pricing = () => {
                 <h3 className="font-semibold">Is there a free trial?</h3>
                 <p className="text-muted-foreground text-sm">
                   Yes! Start with our Free plan or try Pro with a 7-day free trial. No credit card required.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="font-semibold">How accurate are the summaries?</h3>
-                <p className="text-muted-foreground text-sm">
-                  Our AI achieves 95%+ accuracy by analyzing both audio and visual context for comprehensive summaries.
                 </p>
               </div>
             </div>
