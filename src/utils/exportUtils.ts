@@ -21,9 +21,10 @@ interface SummaryData {
   overview: string;
   keyTopics: string[];
   sections: SummarySection[];
+  detailedAnalysis?: string;
 }
 
-export const exportToDocx = async (videoData: VideoData, summaryData: SummaryData) => {
+export const exportToDocx = async (videoData: VideoData, summaryData: SummaryData, exportType: 'full' | 'main-points' | 'detailed-analysis' = 'full') => {
   const doc = new Document({
     sections: [{
       properties: {},
@@ -63,30 +64,80 @@ export const exportToDocx = async (videoData: VideoData, summaryData: SummaryDat
         }),
         new Paragraph({ text: "" }),
         
-        // Sections
-        new Paragraph({
-          text: "Detailed Summary",
-          heading: HeadingLevel.HEADING_1,
-        }),
-        
-        // Add all sections
-        ...summaryData.sections.flatMap(section => [
+        // Content based on export type
+        ...(exportType === 'main-points' ? [
           new Paragraph({
-            text: `${section.title} (${section.startTime} - ${section.endTime})`,
-            heading: HeadingLevel.HEADING_2,
+            text: "Main Points by Section",
+            heading: HeadingLevel.HEADING_1,
           }),
-          new Paragraph({
-            text: section.content,
-          }),
-          new Paragraph({
-            text: "Key Points:",
-            heading: HeadingLevel.HEADING_3,
-          }),
-          ...section.keyPoints.map(point => 
+          ...summaryData.sections.flatMap(section => [
             new Paragraph({
-              text: `• ${point}`,
-            })
-          ),
+              text: `${section.title} (${section.startTime} - ${section.endTime})`,
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              text: "Key Points:",
+              heading: HeadingLevel.HEADING_3,
+            }),
+            ...section.keyPoints.map(point => 
+              new Paragraph({
+                text: `• ${point}`,
+              })
+            ),
+            new Paragraph({ text: "" }),
+          ])
+        ] : exportType === 'detailed-analysis' ? [
+          new Paragraph({
+            text: "Detailed Analysis",
+            heading: HeadingLevel.HEADING_1,
+          }),
+          new Paragraph({
+            text: summaryData.detailedAnalysis || "Comprehensive analysis of the video content covering key themes, methodologies, and insights presented throughout the presentation.",
+          }),
+          new Paragraph({ text: "" }),
+          new Paragraph({
+            text: "Section-by-Section Breakdown",
+            heading: HeadingLevel.HEADING_1,
+          }),
+          ...summaryData.sections.flatMap(section => [
+            new Paragraph({
+              text: `${section.title} (${section.startTime} - ${section.endTime})`,
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              text: section.content,
+            }),
+            new Paragraph({ text: "" }),
+          ])
+        ] : [
+          // Full export (default)
+          new Paragraph({
+            text: "Main Points by Section",
+            heading: HeadingLevel.HEADING_1,
+          }),
+          ...summaryData.sections.flatMap(section => [
+            new Paragraph({
+              text: `${section.title} (${section.startTime} - ${section.endTime})`,
+              heading: HeadingLevel.HEADING_2,
+            }),
+            new Paragraph({
+              text: "Key Points:",
+              heading: HeadingLevel.HEADING_3,
+            }),
+            ...section.keyPoints.map(point => 
+              new Paragraph({
+                text: `• ${point}`,
+              })
+            ),
+            new Paragraph({ text: "" }),
+          ]),
+          new Paragraph({
+            text: "Detailed Analysis",
+            heading: HeadingLevel.HEADING_1,
+          }),
+          new Paragraph({
+            text: summaryData.detailedAnalysis || "Comprehensive analysis of the video content.",
+          }),
           new Paragraph({ text: "" }),
         ]),
       ],
@@ -98,7 +149,7 @@ export const exportToDocx = async (videoData: VideoData, summaryData: SummaryDat
   saveAs(blob, `${videoData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_summary.docx`);
 };
 
-export const exportToPdf = (videoData: VideoData, summaryData: SummaryData) => {
+export const exportToPdf = (videoData: VideoData, summaryData: SummaryData, exportType: 'full' | 'main-points' | 'detailed-analysis' = 'full') => {
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.width;
   const margin = 20;
@@ -145,18 +196,44 @@ export const exportToPdf = (videoData: VideoData, summaryData: SummaryData) => {
   addText(summaryData.keyTopics.join(", "));
   yPosition += 5;
   
-  // Sections
-  addText("Detailed Summary", 14, true);
-  
-  summaryData.sections.forEach(section => {
-    addText(`${section.title} (${section.startTime} - ${section.endTime})`, 12, true);
-    addText(section.content);
-    addText("Key Points:", 11, true);
-    section.keyPoints.forEach(point => {
-      addText(`• ${point}`, 10);
+  // Content based on export type
+  if (exportType === 'main-points') {
+    addText("Main Points by Section", 14, true);
+    summaryData.sections.forEach(section => {
+      addText(`${section.title} (${section.startTime} - ${section.endTime})`, 12, true);
+      addText("Key Points:", 11, true);
+      section.keyPoints.forEach(point => {
+        addText(`• ${point}`, 10);
+      });
+      yPosition += 5;
     });
+  } else if (exportType === 'detailed-analysis') {
+    addText("Detailed Analysis", 14, true);
+    addText(summaryData.detailedAnalysis || "Comprehensive analysis of the video content covering key themes, methodologies, and insights.");
     yPosition += 5;
-  });
+    
+    addText("Section-by-Section Breakdown", 14, true);
+    summaryData.sections.forEach(section => {
+      addText(`${section.title} (${section.startTime} - ${section.endTime})`, 12, true);
+      addText(section.content);
+      yPosition += 5;
+    });
+  } else {
+    // Full export
+    addText("Main Points by Section", 14, true);
+    summaryData.sections.forEach(section => {
+      addText(`${section.title} (${section.startTime} - ${section.endTime})`, 12, true);
+      addText("Key Points:", 11, true);
+      section.keyPoints.forEach(point => {
+        addText(`• ${point}`, 10);
+      });
+      yPosition += 5;
+    });
+    
+    addText("Detailed Analysis", 14, true);
+    addText(summaryData.detailedAnalysis || "Comprehensive analysis of the video content.");
+    yPosition += 5;
+  }
 
   pdf.save(`${videoData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_summary.pdf`);
 };

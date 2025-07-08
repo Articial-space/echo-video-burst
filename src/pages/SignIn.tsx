@@ -19,6 +19,9 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [fullNameError, setFullNameError] = useState('');
   
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
@@ -28,7 +31,10 @@ const SignIn = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Clear any existing secure storage
+    // Clear previous errors
+    setEmailError('');
+    setPasswordError('');
+    setFullNameError('');
     clearSecureStorage(['pendingEmail']);
 
     try {
@@ -37,56 +43,86 @@ const SignIn = () => {
         const sanitizedFullName = sanitizeString(fullName);
         const sanitizedEmail = email.trim().toLowerCase();
         
-        // Basic email validation
+        // Validation
+        let hasErrors = false;
+        
+        if (!sanitizedFullName.trim()) {
+          setFullNameError('Full name is required');
+          hasErrors = true;
+        }
+        
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(sanitizedEmail)) {
-          toast({
-            title: "Invalid email",
-            description: "Please enter a valid email address.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
+          setEmailError('Please enter a valid email address');
+          hasErrors = true;
         }
 
-        // Password strength validation
         if (password.length < 8) {
-          toast({
-            title: "Weak password",
-            description: "Password must be at least 8 characters long.",
-            variant: "destructive",
-          });
+          setPasswordError('Password must be at least 8 characters long');
+          hasErrors = true;
+        }
+        
+        if (hasErrors) {
           setLoading(false);
           return;
         }
 
         const { error } = await signUp(sanitizedEmail, password, sanitizedFullName);
         if (error) {
-          toast({
-            title: "Sign up failed",
-            description: error.message,
-            variant: "destructive",
-          });
+          if (error.message.toLowerCase().includes('email')) {
+            setEmailError(error.message);
+          } else if (error.message.toLowerCase().includes('password')) {
+            setPasswordError(error.message);
+          } else {
+            toast({
+              title: "Sign up failed",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
         } else {
-          // Store email securely in sessionStorage instead of localStorage
           sessionStorage.setItem('pendingEmail', sanitizedEmail);
           toast({
             title: "Success!",
             description: "Please check your email to verify your account.",
           });
-          // Redirect to email verification page
           navigate(`/email-verification`);
         }
       } else {
         const sanitizedEmail = email.trim().toLowerCase();
         
+        // Basic validation for sign in
+        let hasErrors = false;
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(sanitizedEmail)) {
+          setEmailError('Please enter a valid email address');
+          hasErrors = true;
+        }
+        
+        if (password.length < 6) {
+          setPasswordError('Password is required');
+          hasErrors = true;
+        }
+        
+        if (hasErrors) {
+          setLoading(false);
+          return;
+        }
+        
         const { error } = await signIn(sanitizedEmail, password);
         if (error) {
-          toast({
-            title: "Sign in failed",
-            description: error.message,
-            variant: "destructive",
-          });
+          if (error.message.toLowerCase().includes('email') || error.message.toLowerCase().includes('user')) {
+            setEmailError('Invalid email or user not found');
+          } else if (error.message.toLowerCase().includes('password')) {
+            setPasswordError('Invalid password');
+          } else {
+            toast({
+              title: "Sign in failed",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
         } else {
           navigate('/');
         }
@@ -198,6 +234,9 @@ const SignIn = () => {
                 {isSignUp && (
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
+                    {fullNameError && (
+                      <p className="text-sm text-destructive font-medium">{fullNameError}</p>
+                    )}
                     <Input
                       id="fullName"
                       type="text"
@@ -206,12 +245,16 @@ const SignIn = () => {
                       onChange={handleInputChange(setFullName, 50)}
                       required={isSignUp}
                       maxLength={50}
+                      className={fullNameError ? "border-destructive focus:border-destructive" : ""}
                     />
                   </div>
                 )}
                 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
+                  {emailError && (
+                    <p className="text-sm text-destructive font-medium">{emailError}</p>
+                  )}
                   <Input
                     id="email"
                     type="email"
@@ -220,11 +263,15 @@ const SignIn = () => {
                     onChange={handleInputChange(setEmail, 100)}
                     required
                     maxLength={100}
+                    className={emailError ? "border-destructive focus:border-destructive" : ""}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
+                  {passwordError && (
+                    <p className="text-sm text-destructive font-medium">{passwordError}</p>
+                  )}
                   <div className="relative">
                     <Input
                       id="password"
@@ -235,6 +282,7 @@ const SignIn = () => {
                       required
                       minLength={isSignUp ? 8 : 6}
                       maxLength={128}
+                      className={passwordError ? "border-destructive focus:border-destructive" : ""}
                     />
                     <Button
                       type="button"
@@ -250,7 +298,7 @@ const SignIn = () => {
                       )}
                     </Button>
                   </div>
-                  {isSignUp && (
+                  {isSignUp && !passwordError && (
                     <p className="text-xs text-muted-foreground">
                       Password must be at least 8 characters long
                     </p>

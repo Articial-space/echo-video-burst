@@ -130,12 +130,13 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
     });
   };
 
-  const handleExportDocx = async () => {
+  const handleExportDocx = async (exportType: 'full' | 'main-points' | 'detailed-analysis' = 'full') => {
     try {
-      await exportToDocx(videoData, summaryData);
+      await exportToDocx(videoData, { ...summaryData, detailedAnalysis: summaryData.detailedAnalysis }, exportType);
+      const typeLabel = exportType === 'main-points' ? 'Main Points' : exportType === 'detailed-analysis' ? 'Detailed Analysis' : 'Full Summary';
       toast({
         title: "Export successful",
-        description: "Summary exported as DOCX file",
+        description: `${typeLabel} exported as DOCX file`,
       });
     } catch (error) {
       toast({
@@ -146,12 +147,13 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
     }
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = (exportType: 'full' | 'main-points' | 'detailed-analysis' = 'full') => {
     try {
-      exportToPdf(videoData, summaryData);
+      exportToPdf(videoData, { ...summaryData, detailedAnalysis: summaryData.detailedAnalysis }, exportType);
+      const typeLabel = exportType === 'main-points' ? 'Main Points' : exportType === 'detailed-analysis' ? 'Detailed Analysis' : 'Full Summary';
       toast({
         title: "Export successful",
-        description: "Summary exported as PDF file",
+        description: `${typeLabel} exported as PDF file`,
       });
     } catch (error) {
       toast({
@@ -163,13 +165,13 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-8 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-gradient-to-r from-brand-green-50/50 to-transparent p-6 rounded-xl border border-brand-green-100">
         <Button 
           variant="ghost" 
           onClick={onBack}
-          className="mb-4 hover:bg-brand-green-50 hover:text-brand-green-700"
+          className="hover:bg-brand-green-50 hover:text-brand-green-700 text-brand-green-600 font-medium"
         >
           ← Back to Upload
         </Button>
@@ -177,21 +179,21 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
         <div className="flex space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50">
+              <Button variant="outline" size="sm" className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50 shadow-sm">
                 <Download className="h-4 w-4 mr-2" />
-                Export Summary
+                Export Full Summary
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border border-brand-green-200">
+            <DropdownMenuContent align="end" className="bg-white border border-brand-green-200 shadow-lg">
               <DropdownMenuItem 
-                onClick={handleExportPdf}
+                onClick={() => handleExportPdf('full')}
                 className="cursor-pointer hover:bg-brand-green-50"
               >
                 <File className="h-4 w-4 mr-2" />
                 Export as PDF
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={handleExportDocx}
+                onClick={() => handleExportDocx('full')}
                 className="cursor-pointer hover:bg-brand-green-50"
               >
                 <FileText className="h-4 w-4 mr-2" />
@@ -272,15 +274,41 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Main Points by Section</h2>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleCopyContent(summaryData.sections.map(s => `${s.title}:\n${s.keyPoints.map(p => `• ${p}`).join('\n')}`).join('\n\n'))}
-                  className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
-                >
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy All Points
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleCopyContent(summaryData.sections.map(s => `${s.title}:\n${s.keyPoints.map(p => `• ${p}`).join('\n')}`).join('\n\n'))}
+                    className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy All Points
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white border border-brand-green-200">
+                      <DropdownMenuItem 
+                        onClick={() => handleExportPdf('main-points')}
+                        className="cursor-pointer hover:bg-brand-green-50"
+                      >
+                        <File className="h-4 w-4 mr-2" />
+                        Export as PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleExportDocx('main-points')}
+                        className="cursor-pointer hover:bg-brand-green-50"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Export as DOCX
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               
               {summaryData.sections.map((section, index) => (
@@ -323,15 +351,41 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Detailed Analysis</h2>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleCopyContent(`Detailed Analysis:\n\n${summaryData.detailedAnalysis}\n\nSection Summaries:\n\n${summaryData.sections.map(s => `${s.title} (${s.startTime} - ${s.endTime}):\n${s.content}`).join('\n\n')}`)}
-                  className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
-                >
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Analysis
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleCopyContent(`Detailed Analysis:\n\n${summaryData.detailedAnalysis}\n\nSection Summaries:\n\n${summaryData.sections.map(s => `${s.title} (${s.startTime} - ${s.endTime}):\n${s.content}`).join('\n\n')}`)}
+                    className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Analysis
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white border border-brand-green-200">
+                      <DropdownMenuItem 
+                        onClick={() => handleExportPdf('detailed-analysis')}
+                        className="cursor-pointer hover:bg-brand-green-50"
+                      >
+                        <File className="h-4 w-4 mr-2" />
+                        Export as PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleExportDocx('detailed-analysis')}
+                        className="cursor-pointer hover:bg-brand-green-50"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Export as DOCX
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               
               <Card className="p-6 border border-brand-green-100 bg-gradient-to-br from-brand-green-50/30 to-transparent">
