@@ -103,21 +103,21 @@ const Index = () => {
           {!currentVideoData && !showHistory ? (
             <>
               {/* Hero Section */}
-              <div className="text-center space-y-6 mb-12">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              <div className="text-center space-y-6 mb-12 animate-fade-in">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-slide-up">
                   Transform Videos into
-                  <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent animate-float">
                     Actionable Insights
                   </span>
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-up [animation-delay:200ms]">
                   Upload any video or paste a URL to get instant AI-powered summaries with precise timestamps.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center animate-slide-up [animation-delay:400ms]">
                   <Button 
                     size="lg" 
-                    className="bg-brand-gradient hover:opacity-90 text-white px-6 py-3"
+                    className="bg-brand-gradient hover:opacity-90 text-white px-6 py-3 transition-all duration-200"
                     onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
                   >
                     <Upload className="h-4 w-4 mr-2" />
@@ -127,7 +127,7 @@ const Index = () => {
                     <Button 
                       variant="outline" 
                       size="lg"
-                      className="px-6 py-3 border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50"
+                      className="px-6 py-3 border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50 transition-all duration-200"
                       onClick={() => setShowHistory(true)}
                     >
                       <History className="h-4 w-4 mr-2" />
@@ -155,9 +155,13 @@ const Index = () => {
                 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {features.map((feature, index) => (
-                    <Card key={index} className="p-6 glass-effect group hover:shadow-lg transition-all duration-300 border-0">
+                    <Card 
+                      key={index} 
+                      className="p-6 glass-effect group hover:shadow-lg transition-all duration-300 border-0 hover:scale-105 animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
                       <div className="space-y-4">
-                        <div className="w-12 h-12 rounded-lg bg-brand-gradient flex items-center justify-center group-hover:animate-pulse-green">
+                        <div className="w-12 h-12 rounded-lg bg-brand-gradient flex items-center justify-center group-hover:animate-pulse-green transition-transform duration-200 group-hover:rotate-12">
                           <feature.icon className="h-6 w-6 text-white" />
                         </div>
                         <div>
