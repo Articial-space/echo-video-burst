@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import VideoUpload from "@/components/VideoUpload";
 import VideoSummary from "@/components/VideoSummary";
 import VideoHistory from "@/components/VideoHistory";
+import TypingAnimation from "@/components/TypingAnimation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, Upload, Clock, Zap, Target, ArrowRight, History } from "lucide-react";
@@ -106,8 +107,8 @@ const Index = () => {
               <div className="text-center space-y-6 mb-12 animate-fade-in">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-slide-up">
                   Transform Videos into
-                  <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent animate-float">
-                    Actionable Insights
+                  <span className="block animate-float">
+                    <TypingAnimation words={["summary", "insight", "knowledge"]} />
                   </span>
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-up [animation-delay:200ms]">
