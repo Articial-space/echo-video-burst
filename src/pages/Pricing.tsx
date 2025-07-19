@@ -16,7 +16,7 @@ const Pricing = () => {
       name: "Free",
       monthlyPrice: 0,
       annualPrice: 0,
-      description: "Perfect for trying out VideoSummarizer",
+      description: "Perfect for trying out Viel",
       features: [
         "3 video summaries per month",
         "Basic AI analysis",

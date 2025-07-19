@@ -60,8 +60,8 @@ const GetStarted = () => {
           <div className="text-center space-y-6 mb-12">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Get Started with
-              <span className="block bg-gradient-to-r from-black via-brand-green-600 to-black bg-clip-text text-transparent">
-                VideoSummarizer
+              <span className="block lava-lamp bg-clip-text text-transparent">
+                Viel
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -118,7 +118,7 @@ const GetStarted = () => {
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-3">Perfect For Any Use Case</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Whether you're a student, professional, or content creator, VideoSummarizer adapts to your needs.
+                Whether you're a student, professional, or content creator, Viel adapts to your needs.
               </p>
             </div>
             

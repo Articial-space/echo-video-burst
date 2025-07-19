@@ -147,7 +147,7 @@ const Index = () => {
               <section id="features" className="space-y-8">
                 <div className="text-center">
                   <h2 className="text-2xl md:text-3xl font-bold mb-3">
-                    Why Choose VideoSummarizer?
+                    Why Choose Viel?
                   </h2>
                   <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                     Built for professionals who need to extract value from video content quickly.
@@ -213,7 +213,7 @@ const Index = () => {
                 <div className="h-6 w-6 rounded bg-brand-gradient flex items-center justify-center">
                   <Search className="h-3 w-3 text-white" />
                 </div>
-                <span className="font-semibold">VideoSummarizer</span>
+                <span className="font-semibold lava-lamp bg-clip-text text-transparent">Viel</span>
               </div>
               
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">

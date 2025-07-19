@@ -57,10 +57,10 @@ All colors MUST be HSL.
     --brand-green-600: 142 76% 36%;
     --brand-green-700: 142 76% 30%;
 
-    /* Lava lamp animation gradients */
-    --lava-gradient-1: linear-gradient(45deg, hsl(142, 76%, 36%), hsl(142, 76%, 45%), hsl(142, 76%, 50%));
-    --lava-gradient-2: linear-gradient(135deg, hsl(142, 76%, 50%), hsl(142, 76%, 36%), hsl(142, 76%, 45%));
-    --lava-gradient-3: linear-gradient(225deg, hsl(142, 76%, 45%), hsl(142, 76%, 50%), hsl(142, 76%, 36%));
+    /* Lava lamp animation gradients - optimized */
+    --lava-gradient-1: linear-gradient(60deg, hsl(142, 76%, 42%) 0%, hsl(142, 76%, 48%) 30%, hsl(142, 76%, 38%) 70%, hsl(142, 76%, 45%) 100%);
+    --lava-gradient-2: linear-gradient(120deg, hsl(142, 76%, 48%) 0%, hsl(142, 76%, 35%) 30%, hsl(142, 76%, 50%) 70%, hsl(142, 76%, 40%) 100%);
+    --lava-gradient-3: linear-gradient(240deg, hsl(142, 76%, 40%) 0%, hsl(142, 76%, 52%) 30%, hsl(142, 76%, 42%) 70%, hsl(142, 76%, 36%) 100%);
   }
 
   .dark {
@@ -260,28 +260,39 @@ All colors MUST be HSL.
   }
 }
 
-/* Lava Lamp Animation */
+/* Lava Lamp Animation - Optimized */
 .lava-lamp {
   background: var(--lava-gradient-1);
-  background-size: 300% 300%;
-  animation: lava-flow 4s ease-in-out infinite;
+  background-size: 400% 400%;
+  animation: lava-flow 6s ease-in-out infinite;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 @keyframes lava-flow {
   0% {
     background: var(--lava-gradient-1);
     background-position: 0% 50%;
+    filter: brightness(1) saturate(1.1);
   }
-  33% {
+  25% {
     background: var(--lava-gradient-2);
-    background-position: 100% 50%;
+    background-position: 100% 30%;
+    filter: brightness(1.05) saturate(1.15);
   }
-  66% {
+  50% {
     background: var(--lava-gradient-3);
     background-position: 50% 100%;
+    filter: brightness(0.98) saturate(1.2);
+  }
+  75% {
+    background: var(--lava-gradient-2);
+    background-position: 20% 80%;
+    filter: brightness(1.02) saturate(1.1);
   }
   100% {
     background: var(--lava-gradient-1);
     background-position: 0% 50%;
+    filter: brightness(1) saturate(1.1);
   }
 }
