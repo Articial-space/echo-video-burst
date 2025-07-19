@@ -213,7 +213,7 @@ const Index = () => {
                 <div className="h-6 w-6 rounded bg-brand-gradient flex items-center justify-center">
                   <Search className="h-3 w-3 text-white" />
                 </div>
-                <span className="font-semibold lava-lamp bg-clip-text text-transparent">Viel</span>
+                <span className="font-semibold lava-lamp">Viel</span>
               </div>
               
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">

@@ -23,7 +23,7 @@ const Header = () => {
           <div className="h-7 w-7 rounded-lg bg-brand-gradient flex items-center justify-center">
             <Search className="h-3.5 w-3.5 text-white" />
           </div>
-          <span className="text-lg font-bold lava-lamp bg-clip-text text-transparent">
+          <span className="text-lg font-bold lava-lamp">
             Viel
           </span>
         </Link>

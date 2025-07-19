@@ -260,13 +260,27 @@ All colors MUST be HSL.
   }
 }
 
-/* Lava Lamp Animation - Optimized */
+/* Lava Lamp Animation - Fixed */
 .lava-lamp {
   background: var(--lava-gradient-1);
   background-size: 400% 400%;
   animation: lava-flow 6s ease-in-out infinite;
   font-weight: 700;
   letter-spacing: -0.02em;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .lava-lamp {
+    color: hsl(var(--brand-green-600));
+    background: none;
+  }
 }
 
 @keyframes lava-flow {
