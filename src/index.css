@@ -260,7 +260,7 @@ All colors MUST be HSL.
   }
 }
 
-/* Lava Lamp Animation - Fixed */
+/* Lava Lamp Animation - Text-only gradient like 1.1.1.1 */
 .lava-lamp {
   background: var(--lava-gradient-1);
   background-size: 400% 400%;
@@ -268,18 +268,22 @@ All colors MUST be HSL.
   font-weight: 700;
   letter-spacing: -0.02em;
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   color: transparent;
   display: inline-block;
-  position: relative;
+  /* Ensure no background bleeds outside text */
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
-/* Fallback for browsers that don't support background-clip */
+/* Fallback for browsers that don't support background-clip: text */
 @supports not (-webkit-background-clip: text) {
   .lava-lamp {
     color: hsl(var(--brand-green-600));
     background: none;
+    -webkit-text-fill-color: initial;
   }
 }
 
@@ -287,26 +291,21 @@ All colors MUST be HSL.
   0% {
     background: var(--lava-gradient-1);
     background-position: 0% 50%;
-    filter: brightness(1) saturate(1.1);
   }
   25% {
     background: var(--lava-gradient-2);
     background-position: 100% 30%;
-    filter: brightness(1.05) saturate(1.15);
   }
   50% {
     background: var(--lava-gradient-3);
     background-position: 50% 100%;
-    filter: brightness(0.98) saturate(1.2);
   }
   75% {
     background: var(--lava-gradient-2);
     background-position: 20% 80%;
-    filter: brightness(1.02) saturate(1.1);
   }
   100% {
     background: var(--lava-gradient-1);
     background-position: 0% 50%;
-    filter: brightness(1) saturate(1.1);
   }
 }
