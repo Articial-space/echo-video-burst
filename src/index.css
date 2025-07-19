@@ -56,6 +56,11 @@ All colors MUST be HSL.
     --brand-green-500: 142 76% 45%;
     --brand-green-600: 142 76% 36%;
     --brand-green-700: 142 76% 30%;
+
+    /* Lava lamp animation gradients */
+    --lava-gradient-1: linear-gradient(45deg, hsl(142, 76%, 36%), hsl(142, 76%, 45%), hsl(142, 76%, 50%));
+    --lava-gradient-2: linear-gradient(135deg, hsl(142, 76%, 50%), hsl(142, 76%, 36%), hsl(142, 76%, 45%));
+    --lava-gradient-3: linear-gradient(225deg, hsl(142, 76%, 45%), hsl(142, 76%, 50%), hsl(142, 76%, 36%));
   }
 
   .dark {
@@ -252,5 +257,31 @@ All colors MUST be HSL.
   }
   50% {
     opacity: .8;
+  }
+}
+
+/* Lava Lamp Animation */
+.lava-lamp {
+  background: var(--lava-gradient-1);
+  background-size: 300% 300%;
+  animation: lava-flow 4s ease-in-out infinite;
+}
+
+@keyframes lava-flow {
+  0% {
+    background: var(--lava-gradient-1);
+    background-position: 0% 50%;
+  }
+  33% {
+    background: var(--lava-gradient-2);
+    background-position: 100% 50%;
+  }
+  66% {
+    background: var(--lava-gradient-3);
+    background-position: 50% 100%;
+  }
+  100% {
+    background: var(--lava-gradient-1);
+    background-position: 0% 50%;
   }
 }
