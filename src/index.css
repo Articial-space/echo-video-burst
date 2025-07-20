@@ -260,55 +260,21 @@ All colors MUST be HSL.
   }
 }
 
-/* Lava Lamp Animation - Text-only gradient like 1.1.1.1 */
-.lava-lamp {
-  background: var(--lava-gradient-1);
-  background-size: 400% 400%;
-  animation: lava-flow 6s ease-in-out infinite;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+/* Simple Green Gradient Text */
+.brand-text-gradient {
+  background: linear-gradient(135deg, hsl(var(--brand-green-600)) 0%, hsl(var(--brand-green-400)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
   display: inline;
-  /* Remove any potential spacing */
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  /* Ensure background only shows through text */
-  background-attachment: fixed;
 }
 
 /* Fallback for browsers that don't support background-clip: text */
 @supports not (-webkit-background-clip: text) {
-  .lava-lamp {
+  .brand-text-gradient {
     color: hsl(var(--brand-green-600));
     background: none;
     -webkit-text-fill-color: initial;
-  }
-}
-
-@keyframes lava-flow {
-  0% {
-    background: var(--lava-gradient-1);
-    background-position: 0% 50%;
-  }
-  25% {
-    background: var(--lava-gradient-2);
-    background-position: 100% 30%;
-  }
-  50% {
-    background: var(--lava-gradient-3);
-    background-position: 50% 100%;
-  }
-  75% {
-    background: var(--lava-gradient-2);
-    background-position: 20% 80%;
-  }
-  100% {
-    background: var(--lava-gradient-1);
-    background-position: 0% 50%;
   }
 }

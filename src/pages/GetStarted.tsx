@@ -60,7 +60,7 @@ const GetStarted = () => {
           <div className="text-center space-y-6 mb-12">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Get Started with
-              <span className="block lava-lamp">
+              <span className="block brand-text-gradient">
                 Viel
               </span>
             </h1>

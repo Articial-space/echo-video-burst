@@ -178,7 +178,7 @@ const SignIn = () => {
               <div className="h-8 w-8 rounded-lg bg-brand-gradient flex items-center justify-center">
                 <Search className="h-4 w-4 text-white" />
               </div>
-              <span className="text-xl font-bold lava-lamp">
+              <span className="text-xl font-bold brand-text-gradient">
                 Viel
               </span>
             </Link>
