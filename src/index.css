@@ -271,11 +271,10 @@ All colors MUST be HSL.
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  display: inline-block;
-  /* Ensure no background bleeds outside text */
-  padding: 0;
-  margin: 0;
-  line-height: 1;
+  display: inline;
+  /* Force the gradient to only appear in text */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* Fallback for browsers that don't support background-clip: text */
