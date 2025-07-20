@@ -272,9 +272,13 @@ All colors MUST be HSL.
   background-clip: text;
   color: transparent;
   display: inline;
-  /* Force the gradient to only appear in text */
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  /* Remove any potential spacing */
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  /* Ensure background only shows through text */
+  background-attachment: fixed;
 }
 
 /* Fallback for browsers that don't support background-clip: text */
