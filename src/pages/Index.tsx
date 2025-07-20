@@ -7,7 +7,8 @@ import VideoHistory from "@/components/VideoHistory";
 import TypingAnimation from "@/components/TypingAnimation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Upload, Clock, Zap, Target, ArrowRight, History } from "lucide-react";
+import { Upload, Clock, Target, Zap, History, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -66,7 +67,7 @@ const Index = () => {
 
   const features = [
     {
-      icon: Search,
+      icon: Upload,
       title: "Smart Analysis",
       description: "AI-powered video analysis that understands context and extracts key insights automatically."
     },
@@ -209,12 +210,9 @@ const Index = () => {
         <footer className="border-t border-border/40 bg-background/50 backdrop-blur mt-16">
           <div className="container mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <div className="flex items-center space-x-2">
-                <div className="h-6 w-6 rounded bg-brand-gradient flex items-center justify-center">
-                  <Search className="h-3 w-3 text-white" />
-                </div>
-                <span className="font-semibold brand-text-gradient">Viel</span>
-              </div>
+              <Link to="/" className="flex items-center">
+                <span className="text-lg font-bold brand-text-gradient">Viel</span>
+              </Link>
               
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                 <a href="#" className="hover:text-brand-green-600 transition-colors">Privacy</a>

@@ -1,5 +1,5 @@
 
-import { Search, User, LogOut, Menu } from "lucide-react";
+import { User, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,11 +19,8 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="h-7 w-7 rounded-lg bg-brand-gradient flex items-center justify-center">
-            <Search className="h-3.5 w-3.5 text-white" />
-          </div>
-          <span className="text-lg font-bold brand-text-gradient">
+        <Link to="/" className="flex items-center">
+          <span className="text-xl font-bold brand-text-gradient">
             Viel
           </span>
         </Link>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Mail, Clock, RefreshCw } from 'lucide-react';
+import { Mail, Clock, RefreshCw } from 'lucide-react';
 import { clearSecureStorage } from '@/utils/securityUtils';
 
 const EmailVerification = () => {
@@ -104,11 +104,8 @@ const EmailVerification = () => {
         <div className="w-full max-w-md space-y-6">
           {/* Header */}
           <div className="text-center">
-            <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-              <div className="h-8 w-8 rounded-lg bg-brand-gradient flex items-center justify-center">
-                <Search className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-xl font-bold brand-text-gradient">
+            <Link to="/" className="inline-flex items-center mb-6">
+              <span className="text-2xl font-bold brand-text-gradient">
                 Viel
               </span>
             </Link>
