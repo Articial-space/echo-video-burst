@@ -58,9 +58,9 @@ const GetStarted = () => {
         <main className="container mx-auto px-4 py-8">
           {/* Header Section */}
           <div className="text-center space-y-6 mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Get Started with
-              <span className="block brand-text-gradient">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight animate-fade-in">
+              <span className="block mb-2 text-foreground/90">Get Started with</span>
+              <span className="block brand-text-gradient hover-scale transition-transform duration-300">
                 Viel
               </span>
             </h1>
