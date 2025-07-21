@@ -76,27 +76,27 @@ const GetStarted = () => {
           </div>
 
           {/* Steps Section */}
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold text-center mb-8">How It Works</h2>
+          <section className="mb-16 animate-fade-in">
+            <h2 className="text-2xl font-bold text-center mb-8 animate-fade-in">How It Works</h2>
             
             <div className="grid md:grid-cols-3 gap-6">
               {steps.map((step, index) => (
-                <div key={index} className="relative">
-                  <Card className="p-6 glass-effect border-0 h-full">
+                <div key={index} className="relative group">
+                  <Card className="p-6 glass-effect border-0 h-full hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate-fade-in hover-scale" style={{ animationDelay: `${index * 200}ms` }}>
                     <div className="space-y-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-lg bg-brand-gradient flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-brand-gradient flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <step.icon className="h-5 w-5 text-white" />
                         </div>
-                        <div className="w-6 h-6 rounded-full bg-brand-green-100 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-full bg-brand-green-100 flex items-center justify-center animate-pulse">
                           <span className="text-brand-green-600 text-sm font-bold">{index + 1}</span>
                         </div>
                       </div>
                       
                       <div className="space-y-3">
-                        <h3 className="text-lg font-semibold">{step.title}</h3>
+                        <h3 className="text-lg font-semibold group-hover:text-brand-green-600 transition-colors duration-300">{step.title}</h3>
                         <p className="text-muted-foreground text-sm">{step.description}</p>
-                        <div className="p-3 bg-brand-green-50 rounded-lg">
+                        <div className="p-3 bg-brand-green-50 rounded-lg group-hover:bg-brand-green-100 transition-colors duration-300">
                           <p className="text-brand-green-700 text-sm font-medium">{step.tip}</p>
                         </div>
                       </div>
@@ -104,7 +104,7 @@ const GetStarted = () => {
                   </Card>
                   
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2">
+                    <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 animate-bounce">
                       <ArrowRight className="h-5 w-5 text-brand-green-400" />
                     </div>
                   )}
