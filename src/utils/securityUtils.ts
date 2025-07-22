@@ -4,8 +4,18 @@
 export const validateVideoUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
   
+  // Prevent data URLs and javascript URLs
+  if (url.startsWith('data:') || url.startsWith('javascript:') || url.startsWith('vbscript:')) {
+    return false;
+  }
+  
   try {
     const urlObj = new URL(url);
+    
+    // Only allow HTTPS for security (except localhost for development)
+    if (urlObj.protocol !== 'https:' && !urlObj.hostname.includes('localhost')) {
+      return false;
+    }
     
     // Allow common video hosting domains
     const allowedDomains = [
@@ -25,10 +35,15 @@ export const validateVideoUrl = (url: string): boolean => {
       urlObj.hostname.endsWith(`.${domain}`)
     );
     
-    // Also allow direct video file URLs
+    // Also allow direct video file URLs with stricter validation
     const hasVideoExtension = /\.(mp4|webm|ogg|avi|mov|wmv|flv|m4v)$/i.test(urlObj.pathname);
     
-    return isAllowedDomain || hasVideoExtension;
+    // Prevent URLs with suspicious query parameters
+    const suspiciousParams = ['javascript', 'script', 'eval', 'alert'];
+    const queryString = urlObj.search.toLowerCase();
+    const hasSuspiciousParams = suspiciousParams.some(param => queryString.includes(param));
+    
+    return (isAllowedDomain || hasVideoExtension) && !hasSuspiciousParams;
   } catch {
     return false;
   }
@@ -84,8 +99,45 @@ export const sanitizeString = (input: string): string => {
   // Remove potentially dangerous characters and limit length
   return input
     .replace(/[<>'"&]/g, '') // Remove HTML/script injection characters
+    .replace(/javascript:/gi, '') // Remove javascript: protocols
+    .replace(/data:/gi, '') // Remove data: protocols
+    .replace(/vbscript:/gi, '') // Remove vbscript: protocols
+    .replace(/on\w+=/gi, '') // Remove event handlers like onclick=
     .trim()
     .substring(0, 500); // Limit length
+};
+
+export const sanitizeVideoTitle = (title: string): string => {
+  if (!title || typeof title !== 'string') return '';
+  
+  // Enhanced sanitization for video titles
+  return title
+    .replace(/[<>'"&]/g, '') // Remove HTML/script injection characters
+    .replace(/[\r\n\t]/g, ' ') // Replace line breaks and tabs with spaces
+    .replace(/\s+/g, ' ') // Normalize multiple spaces
+    .trim()
+    .substring(0, 200); // Shorter limit for titles
+};
+
+export const validateEmail = (email: string): boolean => {
+  if (!email || typeof email !== 'string') return false;
+  
+  // Basic email validation with additional security checks
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isValidFormat = emailRegex.test(email);
+  
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /javascript:/i,
+    /data:/i,
+    /vbscript:/i,
+    /<script/i,
+    /on\w+=/i
+  ];
+  
+  const hasSuspiciousContent = suspiciousPatterns.some(pattern => pattern.test(email));
+  
+  return isValidFormat && !hasSuspiciousContent && email.length <= 254;
 };
 
 export const clearSecureStorage = (keys: string[]): void => {
