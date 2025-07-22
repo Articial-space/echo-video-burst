@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Clock, Play, ChevronRight, Copy, Download, FileText, File, Lightbulb, BookOpen } from "lucide-react";
+import { Clock, Play, ChevronRight, Copy, Download, FileText, File, Lightbulb, BookOpen, Share, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { exportToDocx, exportToPdf } from "@/utils/exportUtils";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,9 +36,10 @@ interface SummarySection {
 interface VideoSummaryProps {
   videoData: VideoData;
   onBack: () => void;
+  isSharedView?: boolean;
 }
 
-const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
+const VideoSummary = ({ videoData, onBack, isSharedView = false }: VideoSummaryProps) => {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -164,6 +166,37 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      // First, make the video public and get the share token
+      const { data, error } = await supabase
+        .from('videos')
+        .update({ is_public: true })
+        .eq('id', videoData.id)
+        .select('share_token')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const shareUrl = `${window.location.origin}/shared/${data.share_token}`;
+      await navigator.clipboard.writeText(shareUrl);
+      
+      toast({
+        title: "Share link copied!",
+        description: "Anyone with this link can view your video summary.",
+      });
+    } catch (error) {
+      console.error('Error sharing video:', error);
+      toast({
+        title: "Share failed",
+        description: "Failed to create share link. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 p-6">
       {/* Header */}
@@ -173,10 +206,22 @@ const VideoSummary = ({ videoData, onBack }: VideoSummaryProps) => {
           onClick={onBack}
           className="hover:bg-brand-green-50 hover:text-brand-green-700 text-brand-green-600 font-medium"
         >
-          ← Back to Upload
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {isSharedView ? 'Go Back' : 'Back to Upload'}
         </Button>
         
         <div className="flex space-x-2">
+          {!isSharedView && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleShare}
+              className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50 shadow-sm"
+            >
+              <Share className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50 shadow-sm">

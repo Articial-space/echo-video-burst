@@ -11,6 +11,7 @@ import Pricing from "./pages/Pricing";
 import GetStarted from "./pages/GetStarted";
 import EmailVerification from "./pages/EmailVerification";
 import NotFound from "./pages/NotFound";
+import SharedVideo from "./pages/SharedVideo";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/email-verification" element={<EmailVerification />} />
+            <Route path="/shared/:shareToken" element={<SharedVideo />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

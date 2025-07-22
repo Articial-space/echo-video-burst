@@ -47,7 +47,9 @@ export type Database = {
           duration: string | null
           file_name: string | null
           id: string
+          is_public: boolean | null
           sections: Json | null
+          share_token: string | null
           summary: Json | null
           thumbnail: string | null
           title: string
@@ -60,7 +62,9 @@ export type Database = {
           duration?: string | null
           file_name?: string | null
           id?: string
+          is_public?: boolean | null
           sections?: Json | null
+          share_token?: string | null
           summary?: Json | null
           thumbnail?: string | null
           title: string
@@ -73,7 +77,9 @@ export type Database = {
           duration?: string | null
           file_name?: string | null
           id?: string
+          is_public?: boolean | null
           sections?: Json | null
+          share_token?: string | null
           summary?: Json | null
           thumbnail?: string | null
           title?: string
