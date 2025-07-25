@@ -64,21 +64,22 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				brand: {
-					black: '#000000',
 					green: {
-						400: '#4ade80',
-						500: '#22c55e',
-						600: '#16a34a',
-						700: '#15803d'
-					},
-					white: '#ffffff'
+						50: 'hsl(var(--brand-green-50))',
+						100: 'hsl(var(--brand-green-100))',
+						200: 'hsl(var(--brand-green-200))',
+						400: 'hsl(var(--brand-green-400))',
+						500: 'hsl(var(--brand-green-500))',
+						600: 'hsl(var(--brand-green-600))',
+						700: 'hsl(var(--brand-green-700))'
+					}
 				}
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-				'brand-gradient': 'linear-gradient(135deg, #000000 0%, #16a34a 50%, #000000 100%)',
-				'brand-gradient-light': 'linear-gradient(135deg, #f8fafc 0%, #dcfce7 50%, #f8fafc 100%)'
+				'brand-gradient': 'linear-gradient(135deg, hsl(var(--brand-green-600)) 0%, hsl(var(--brand-green-400)) 100%)',
+				'brand-gradient-light': 'linear-gradient(135deg, hsl(var(--brand-green-50)) 0%, hsl(var(--brand-green-100)) 50%, hsl(var(--brand-green-50)) 100%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -111,8 +112,8 @@ export default {
 					'100%': { opacity: '1', transform: 'translateY(0)' }
 				},
 				'pulse-green': {
-					'0%, 100%': { boxShadow: '0 0 0 0 rgba(34, 197, 94, 0.7)' },
-					'50%': { boxShadow: '0 0 0 10px rgba(34, 197, 94, 0)' }
+					'0%, 100%': { boxShadow: '0 0 0 0 hsl(var(--brand-green-500) / 0.7)' },
+					'50%': { boxShadow: '0 0 0 10px hsl(var(--brand-green-500) / 0)' }
 				},
 				'button-press': {
 					'0%': { transform: 'scale(1)' },

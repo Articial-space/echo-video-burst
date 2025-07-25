@@ -5,6 +5,7 @@ import VideoUpload from "@/components/VideoUpload";
 import VideoSummary from "@/components/VideoSummary";
 import VideoHistory from "@/components/VideoHistory";
 import TypingAnimation from "@/components/TypingAnimation";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, Clock, Target, Zap, History, ArrowRight } from "lucide-react";
@@ -90,8 +91,13 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-green-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+        <div className="gradient-mesh min-h-screen">
+          <Header />
+          <main className="container mx-auto px-4 py-6">
+            <LoadingSkeleton type="upload" />
+          </main>
+        </div>
       </div>
     );
   }
