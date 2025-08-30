@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Crown, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserPlan } from "@/hooks/use-user-plan";
 
 const Pricing = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const { user } = useAuth();
+  const { userPlan } = useUserPlan();
 
   const plans = [
     {
@@ -121,29 +125,48 @@ const Pricing = () => {
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
-            {plans.map((plan, index) => (
-              <Card 
-                key={index} 
-                className={`relative p-6 glass-effect border-0 ${
-                  plan.popular 
-                    ? 'ring-2 ring-brand-green-500 scale-105 shadow-xl' 
-                    : 'hover:shadow-lg'
-                } transition-all duration-300`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-brand-gradient text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                      <Star className="h-3 w-3" />
-                      <span>Most Popular</span>
+            {plans.map((plan, index) => {
+              const isCurrentPlan = user && userPlan === plan.name;
+              const isUpgrade = user && plan.name !== 'Free' && userPlan === 'Free';
+              
+              return (
+                <Card 
+                  key={index} 
+                  className={`relative p-6 glass-effect border-0 ${
+                    isCurrentPlan
+                      ? 'ring-2 ring-blue-500 shadow-xl bg-blue-50/30'
+                      : plan.popular 
+                      ? 'ring-2 ring-brand-green-500 scale-105 shadow-xl' 
+                      : 'hover:shadow-lg'
+                  } transition-all duration-300`}
+                >
+                  {isCurrentPlan && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                        <Check className="h-3 w-3" />
+                        <span>Current Plan</span>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold">{plan.name}</h3>
-                    <p className="text-muted-foreground text-sm">{plan.description}</p>
-                  </div>
+                  )}
+                  
+                  {!isCurrentPlan && plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-brand-gradient text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                        <Star className="h-3 w-3" />
+                        <span>Most Popular</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="text-xl font-bold">{plan.name}</h3>
+                        {plan.name === 'Enterprise' && <Crown className="h-5 w-5 text-purple-600" />}
+                        {plan.name === 'Pro' && <Zap className="h-5 w-5 text-brand-green-600" />}
+                      </div>
+                      <p className="text-muted-foreground text-sm">{plan.description}</p>
+                    </div>
                   
                   <div className="space-y-1">
                     <div className="flex items-baseline space-x-1">
@@ -171,21 +194,36 @@ const Pricing = () => {
                     ))}
                   </div>
                   
-                  <Link to="/signin" className="block">
+                  {isCurrentPlan ? (
                     <Button 
-                      className={`w-full ${
-                        plan.buttonVariant === 'default' 
-                          ? 'bg-brand-gradient hover:opacity-90 text-white' 
-                          : 'border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50'
-                      }`}
-                      variant={plan.buttonVariant}
+                      className="w-full bg-gray-100 text-gray-500 cursor-not-allowed"
+                      variant="secondary"
+                      disabled
                     >
-                      {plan.buttonText}
+                      Current Plan
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link to={user ? "#" : "/signin"} className="block">
+                      <Button 
+                        className={`w-full ${
+                          plan.buttonVariant === 'default' 
+                            ? 'bg-brand-gradient hover:opacity-90 text-white' 
+                            : 'border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50'
+                        }`}
+                        variant={plan.buttonVariant}
+                      >
+                        {user ? (
+                          isUpgrade ? "Upgrade Now" : plan.buttonText
+                        ) : (
+                          plan.buttonText
+                        )}
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </Card>
-            ))}
+              );
+            })}
           </div>
 
           {/* FAQ Section */}

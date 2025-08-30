@@ -8,13 +8,25 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Pricing from "./pages/Pricing";
 import GetStarted from "./pages/GetStarted";
 import EmailVerification from "./pages/EmailVerification";
 import NotFound from "./pages/NotFound";
 import SharedVideo from "./pages/SharedVideo";
+import AuthDebug from "./components/AuthDebug";
+import PasswordResetTest from "./components/PasswordResetTest";
+import EmailRateLimitDemo from "./components/EmailRateLimitDemo";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <ErrorBoundary>
@@ -27,10 +39,15 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/signin" element={<SignIn />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/email-verification" element={<EmailVerification />} />
               <Route path="/shared/:shareToken" element={<SharedVideo />} />
+                                    <Route path="/auth-debug" element={<AuthDebug />} />
+                      <Route path="/password-reset-test" element={<PasswordResetTest />} />
+                      <Route path="/email-rate-limit-demo" element={<EmailRateLimitDemo />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

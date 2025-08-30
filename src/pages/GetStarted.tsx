@@ -67,7 +67,7 @@ const GetStarted = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Transform any video into actionable insights in three simple steps. No technical expertise required.
             </p>
-            <Link to="/signin">
+            <Link to="/signin?mode=signup">
               <Button size="lg" className="bg-brand-gradient hover:opacity-90 text-white">
                 Start Free Now
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -151,7 +151,7 @@ const GetStarted = () => {
                   Join thousands of users who save hours every week with intelligent video summaries.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link to="/">
+                  <Link to="/signin?mode=signup">
                     <Button size="lg" className="bg-brand-gradient hover:opacity-90">
                       Try It Now - Free
                     </Button>

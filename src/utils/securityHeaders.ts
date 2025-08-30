@@ -54,11 +54,11 @@ export const preventClickjacking = (): void => {
     try {
       const parentOrigin = document.referrer ? new URL(document.referrer).origin : '';
       if (!validateOrigin(parentOrigin)) {
-        window.top!.location = window.self.location;
+        window.top!.location.href = window.self.location.href;
       }
     } catch {
       // If we can't access parent, assume it's malicious
-      window.top!.location = window.self.location;
+      window.top!.location.href = window.self.location.href;
     }
   }
 };
@@ -93,7 +93,7 @@ export const setupSecurityEventListeners = (): void => {
   };
 
   // Monitor for DevTools opening (basic detection)
-  let devtools = {
+  const devtools = {
     open: false,
     orientation: null as string | null
   };

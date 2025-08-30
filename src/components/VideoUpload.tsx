@@ -137,28 +137,33 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Search Bar */}
-      <Card className="p-6 glass-effect">
-        <div className="flex flex-col space-y-4">
-          <h2 className="text-2xl font-semibold text-center">
-            Enter video URL or upload a file
-          </h2>
+      <Card className="p-8 glass-effect border-brand-green-200">
+        <div className="flex flex-col space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Analyze Video
+            </h2>
+            <p className="text-muted-foreground">
+              Enter a video URL or upload a file to get instant AI-powered summaries
+            </p>
+          </div>
           
           {validationError && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="border-red-200 bg-red-50">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>{validationError}</AlertDescription>
             </Alert>
           )}
           
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-brand-green-600" />
               <Input
                 placeholder="Paste YouTube, Vimeo, or any video URL here..."
                 value={searchQuery}
                 onChange={handleInputChange}
                 onKeyPress={(e) => e.key === 'Enter' && handleUrlSearch()}
-                className="pl-10 h-12 text-base"
+                className="pl-12 h-14 text-base border-brand-green-200 focus:border-brand-green-500 focus:ring-brand-green-500"
                 disabled={isProcessing}
                 maxLength={500}
               />
@@ -166,22 +171,33 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
             <Button 
               onClick={handleUrlSearch}
               disabled={!searchQuery.trim() || isProcessing}
-              className="h-12 px-6 bg-brand-gradient hover:opacity-90"
+              className="h-14 px-8 bg-brand-gradient hover:opacity-90 text-white shadow-lg"
             >
-              <Play className="h-4 w-4 mr-2" />
-              Analyze
+              {isProcessing ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  <Play className="h-5 w-5 mr-2" />
+                  Analyze
+                </>
+              )}
             </Button>
           </div>
         </div>
       </Card>
 
       {/* File Upload */}
-      <Card className="p-8 glass-effect">
+      <Card className="p-8 glass-effect border-brand-green-200">
+        <div className="text-center space-y-4 mb-6">
+          <h3 className="text-xl font-semibold text-gray-900">Or upload a video file</h3>
+          <p className="text-muted-foreground">Drag and drop or click to browse</p>
+        </div>
+        
         <div
           className={`border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 ${
             isDragging 
               ? 'border-brand-green-500 bg-brand-green-50' 
-              : 'border-border hover:border-brand-green-400'
+              : 'border-brand-green-300 hover:border-brand-green-400 hover:bg-brand-green-50/50'
           }`}
           onDrop={handleDrop}
           onDragOver={(e) => {
@@ -200,43 +216,50 @@ const VideoUpload = ({ onVideoProcessed }: VideoUploadProps) => {
           />
           
           <div className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-brand-gradient rounded-full flex items-center justify-center animate-pulse-green">
-              <Upload className="h-6 w-6 text-white" />
+            <div className="w-16 h-16 mx-auto bg-brand-gradient rounded-full flex items-center justify-center shadow-lg">
+              <Upload className="h-8 w-8 text-white" />
             </div>
             
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold">
-                {isProcessing ? 'Processing your video...' : 'Drop your video here'}
-              </h3>
-              <p className="text-muted-foreground">
-                {isProcessing 
-                  ? 'This may take a few moments' 
-                  : 'Supports MP4, MOV, AVI, and more (Max 100MB)'
-                }
+            <div>
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                {isDragging ? 'Drop your video here' : 'Drag & drop your video here'}
               </p>
-            </div>
-            
-            {!isProcessing && (
+              <p className="text-muted-foreground mb-4">
+                Supports MP4, WebM, AVI, MOV, and more (max 100MB)
+              </p>
+              
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
-                size="lg"
-                className="mt-4"
+                className="border-brand-green-200 text-brand-green-700 hover:bg-brand-green-50 hover:border-brand-green-300"
+                disabled={isProcessing}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Choose File
+                Browse Files
               </Button>
-            )}
-            
-            {isProcessing && (
-              <div className="flex items-center justify-center space-x-2 text-brand-green-600">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-green-600"></div>
-                <span>Processing...</span>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </Card>
+
+      {/* Processing State */}
+      {isProcessing && (
+        <Card className="p-8 glass-effect border-brand-green-200">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 mx-auto bg-brand-gradient rounded-full flex items-center justify-center shadow-lg">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Processing your video...
+              </h3>
+              <p className="text-muted-foreground">
+                This may take a few moments. Please don't close this page.
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };

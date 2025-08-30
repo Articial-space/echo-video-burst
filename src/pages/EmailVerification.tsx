@@ -1,27 +1,100 @@
 
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Clock, RefreshCw } from 'lucide-react';
+import { useEmailRateLimit } from '@/hooks/use-email-rate-limit';
+import { Mail, Clock, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { clearSecureStorage } from '@/utils/securityUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 const EmailVerification = () => {
-  const [countdown, setCountdown] = useState(60);
-  const [canResend, setCanResend] = useState(false);
-  const { user, signUp } = useAuth();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending');
+  const { user, loading, verifyEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  // Get email from URL params or sessionStorage (more secure than localStorage)
-  const urlParams = new URLSearchParams(window.location.search);
-  const email = urlParams.get('email') || sessionStorage.getItem('pendingEmail') || '';
+  // Rate limiting hook for email verification resends
+  const {
+    canSend: canResend,
+    timeRemaining,
+    startCooldown,
+    formatTime
+  } = useEmailRateLimit({
+    cooldownSeconds: 60,
+    storageKey: 'email-verification-cooldown'
+  });
+
+  // Get email from URL params or sessionStorage
+  const emailFromUrl = searchParams.get('email');
+  const emailFromStorage = sessionStorage.getItem('pendingEmail');
+  const email = emailFromUrl || emailFromStorage || '';
+
+  // Check for verification tokens in URL
+  const accessToken = searchParams.get('access_token');
+  const refreshToken = searchParams.get('refresh_token');
+  const type = searchParams.get('type');
 
   useEffect(() => {
-    // If user is already verified, redirect to home and clear storage
-    if (user) {
+    // Handle email verification from URL
+    if (accessToken && refreshToken && type === 'signup') {
+      handleEmailVerification();
+    }
+  }, [accessToken, refreshToken, type]);
+
+  const handleEmailVerification = async () => {
+    setIsVerifying(true);
+    try {
+      console.log('Handling email verification with tokens');
+      
+      const { error } = await verifyEmail(accessToken!, refreshToken!);
+
+      if (error) {
+        console.error('Email verification error:', error);
+        setVerificationStatus('error');
+        toast({
+          title: "Verification failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('Email verification successful');
+        setVerificationStatus('success');
+        clearSecureStorage(['pendingEmail']);
+        
+        // Clear URL parameters for security
+        window.history.replaceState({}, '', '/email-verification');
+        
+        toast({
+          title: "Email verified!",
+          description: "Your account has been successfully verified.",
+        });
+        
+        // Redirect to home after a short delay
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Email verification error:', error);
+      setVerificationStatus('error');
+      toast({
+        title: "Verification failed",
+        description: "An unexpected error occurred during verification.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  useEffect(() => {
+    // If user is already verified and confirmed, redirect to home and clear storage
+    if (user && user.email_confirmed_at && !isVerifying) {
       clearSecureStorage(['pendingEmail']);
       navigate('/');
       return;
@@ -32,22 +105,10 @@ const EmailVerification = () => {
       clearSecureStorage(['pendingEmail']);
     }, 30 * 60 * 1000); // 30 minutes
 
-    // Countdown for resend button
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          setCanResend(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
     return () => {
-      clearInterval(timer);
       clearTimeout(cleanupTimer);
     };
-  }, [user, navigate]);
+  }, [user, navigate, isVerifying]);
 
   const handleResendEmail = async () => {
     if (!email) {
@@ -60,8 +121,18 @@ const EmailVerification = () => {
     }
 
     try {
-      const { error } = await signUp(email, '', '');
+      console.log('Resending verification email to:', email);
+      
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/email-verification`
+        }
+      });
+      
       if (error) {
+        console.error('Resend email error:', error);
         toast({
           title: "Failed to resend email",
           description: error.message,
@@ -72,10 +143,10 @@ const EmailVerification = () => {
           title: "Email sent!",
           description: "Please check your inbox for the verification link.",
         });
-        setCountdown(60);
-        setCanResend(false);
+        startCooldown(); // Start the 60-second cooldown
       }
     } catch (error) {
+      console.error('Resend email error:', error);
       toast({
         title: "An error occurred",
         description: "Please try again later.",
@@ -84,19 +155,70 @@ const EmailVerification = () => {
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
-  // Clear email from URL for security
-  useEffect(() => {
-    if (urlParams.get('email')) {
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, '', newUrl);
-    }
-  }, []);
+
+  // Show loading state while verifying
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+        <div className="gradient-mesh min-h-screen flex items-center justify-center p-4">
+          <Card className="p-6 glass-effect text-center space-y-6">
+            <div className="w-16 h-16 bg-brand-gradient rounded-full flex items-center justify-center mx-auto animate-spin">
+              <RefreshCw className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold">Verifying your email...</h1>
+            <p className="text-muted-foreground">Please wait while we verify your account.</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Show success state
+  if (verificationStatus === 'success') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+        <div className="gradient-mesh min-h-screen flex items-center justify-center p-4">
+          <Card className="p-6 glass-effect text-center space-y-6">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-green-700">Email verified!</h1>
+            <p className="text-muted-foreground">Your account has been successfully verified.</p>
+            <p className="text-sm text-muted-foreground">Redirecting to home page...</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (verificationStatus === 'error') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+        <div className="gradient-mesh min-h-screen flex items-center justify-center p-4">
+          <Card className="p-6 glass-effect text-center space-y-6">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto">
+              <AlertCircle className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-red-700">Verification failed</h1>
+            <p className="text-muted-foreground">There was an error verifying your email.</p>
+            <div className="space-y-3">
+              <Button onClick={handleResendEmail} className="w-full">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Resend verification email
+              </Button>
+              <Link to="/signin">
+                <Button variant="outline" className="w-full">
+                  Back to sign in
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
@@ -162,7 +284,7 @@ const EmailVerification = () => {
                   ) : (
                     <>
                       <Clock className="h-4 w-4 mr-2" />
-                      Resend in {formatTime(countdown)}
+                      Resend in {formatTime(timeRemaining)}
                     </>
                   )}
                 </Button>

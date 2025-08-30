@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { sanitizeString, clearSecureStorage } from '@/utils/securityUtils';
 
 const SignIn = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,9 +24,41 @@ const SignIn = () => {
   const [passwordError, setPasswordError] = useState('');
   const [fullNameError, setFullNameError] = useState('');
   
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Redirect authenticated users away from auth pages
+  useEffect(() => {
+    if (!authLoading && user) {
+      // If user is already authenticated, redirect to home
+      navigate('/', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
+
+  // Check URL params to set initial mode
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setIsSignUp(true);
+    }
+  }, [searchParams]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+        <div className="gradient-mesh min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-green-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the form if user is authenticated (will be redirected)
+  if (user) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +100,7 @@ const SignIn = () => {
           return;
         }
 
-        const { error } = await signUp(sanitizedEmail, password, sanitizedFullName);
+        const { error, requiresEmailConfirmation } = await signUp(sanitizedEmail, password, sanitizedFullName);
         if (error) {
           if (error.message.toLowerCase().includes('email')) {
             setEmailError(error.message);
@@ -81,12 +114,22 @@ const SignIn = () => {
             });
           }
         } else {
-          sessionStorage.setItem('pendingEmail', sanitizedEmail);
-          toast({
-            title: "Success!",
-            description: "Please check your email to verify your account.",
-          });
-          navigate(`/email-verification`);
+          if (requiresEmailConfirmation) {
+            // Email verification required
+            sessionStorage.setItem('pendingEmail', sanitizedEmail);
+            toast({
+              title: "Account created!",
+              description: "Please check your email to verify your account before signing in.",
+            });
+            navigate(`/email-verification`);
+          } else {
+            // No email verification required (auto-signed in)
+            toast({
+              title: "Welcome!",
+              description: "Your account has been created and you're now signed in.",
+            });
+            navigate('/');
+          }
         }
       } else {
         const sanitizedEmail = email.trim().toLowerCase();
@@ -112,6 +155,7 @@ const SignIn = () => {
         
         const { error } = await signIn(sanitizedEmail, password);
         if (error) {
+          console.error('Sign in error:', error);
           if (error.message.toLowerCase().includes('email') || error.message.toLowerCase().includes('user')) {
             setEmailError('Invalid email or user not found');
           } else if (error.message.toLowerCase().includes('password')) {
@@ -124,6 +168,11 @@ const SignIn = () => {
             });
           }
         } else {
+          // Authentication successful - the AuthContext will handle the session
+          toast({
+            title: "Welcome back!",
+            description: "Successfully signed in.",
+          });
           navigate('/');
         }
       }
@@ -145,13 +194,21 @@ const SignIn = () => {
     try {
       const { error } = await signInWithGoogle();
       if (error) {
+        console.error('Google sign in error:', error);
         toast({
           title: "Google sign in failed",
           description: error.message,
           variant: "destructive",
         });
+      } else {
+        // For OAuth, the user will be redirected automatically
+        toast({
+          title: "Redirecting to Google...",
+          description: "Please complete the sign-in process.",
+        });
       }
     } catch (error) {
+      console.error('Google sign in error:', error);
       toast({
         title: "An error occurred",
         description: "Please try again later.",
@@ -299,6 +356,17 @@ const SignIn = () => {
                     <p className="text-xs text-muted-foreground">
                       Password must be at least 8 characters long
                     </p>
+                  )}
+                  {!isSignUp && (
+                    <div className="text-right">
+                      <Button
+                        variant="link"
+                        asChild
+                        className="text-xs text-brand-green-600 hover:text-brand-green-700 h-auto p-0"
+                      >
+                        <Link to="/forgot-password">Forgot password?</Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
 

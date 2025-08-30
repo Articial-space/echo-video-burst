@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import VideoSummary from '@/components/VideoSummary';
 import Header from '@/components/Header';
 import { Loader2 } from 'lucide-react';
+import type { Json } from '@/integrations/supabase/types';
 
 interface VideoData {
   id: string;
@@ -11,8 +12,8 @@ interface VideoData {
   duration: string;
   url: string;
   thumbnail: string;
-  summary?: any;
-  sections?: any[];
+  summary?: Json | null;
+  sections?: Json | null;
 }
 
 const SharedVideo = () => {
